@@ -42,3 +42,32 @@ def download_csv(path, url=CORPUS_CSV, **kwargs):
     else:
         urllib.request.urlretrieve(url=url, filename=path)
 
+
+def get_recommendation_data(path, **kwargs):
+    """Reads recomendation columns from B2W corpus.
+
+    Creates a new dataset from the B2W corpus. This new dataset contains
+    `review_text` and `recommend_to_a_friend` columns renamed as `text` and
+    `target`, respectively. This dataset is usefull for classification task.
+
+    Parameters
+    ----------
+    path : str
+        path to B2W corpus in csv format. Can be the URL to original csv corpus
+        or any URL.
+    **kwargs
+        extra arguments passed to ``pandas.read_csv`` function.
+
+    Returns
+    -------
+    pandas.DataFrame
+
+    Notes
+    -----
+    This dataset is usefull for classification tasks.
+    """
+    usecols = dict(review_text='text', recommend_to_a_friend='target')
+    df = pd.read_csv(path, usecols=usecols, **kwargs)
+    df.columns = [usecols[c] for c in df.columns]
+
+    return df
