@@ -46,7 +46,7 @@ def download_csv(path, url=CORPUS_CSV, **kwargs):
 def get_recommendation_data(path, **kwargs):
     """Reads recomendation columns from B2W corpus.
 
-    Creates a new dataset from the B2W corpus. This new dataset contains
+    Creates a new dataset from B2W corpus. This new dataset contains
     `review_text` and `recommend_to_a_friend` columns renamed as `text` and
     `target`, respectively. This dataset is usefull for classification task.
 
