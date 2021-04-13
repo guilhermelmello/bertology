@@ -48,7 +48,7 @@ def get_recommendation_data(path, **kwargs):
 
     Creates a new dataset from B2W corpus. This new dataset contains
     `review_text` and `recommend_to_a_friend` columns renamed as `text` and
-    `target`, respectively. This dataset is usefull for classification task.
+    `target`, respectively.
 
     Parameters
     ----------
@@ -64,10 +64,18 @@ def get_recommendation_data(path, **kwargs):
 
     Notes
     -----
-    This dataset is usefull for classification tasks.
+    This dataset is usefull for classification tasks, and contains the values:
+    - text      is the main content of the product review.
+    - target    is a binary value where 1 represents the user would recommend
+                the product to a friend, and 0 represents that he would not.
+                This column may contain null and other values.
     """
     usecols = dict(review_text='text', recommend_to_a_friend='target')
     df = pd.read_csv(path, usecols=usecols, **kwargs)
     df.columns = [usecols[c] for c in df.columns]
+
+    # change target to numeric
+    df.target = df.target.apply(lambda t: 1 if t == 'Yes' else t)
+    df.target = df.target.apply(lambda t: 0 if t == 'No' else t)
 
     return df
