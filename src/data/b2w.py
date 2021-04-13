@@ -7,6 +7,7 @@ corpus of product reviews available at:
 """
 
 import pandas as pd
+import re
 import urllib.request
 
 
@@ -79,3 +80,42 @@ def get_recommendation_data(path, **kwargs):
     df.target = df.target.apply(lambda t: 0 if t == 'No' else t)
 
     return df
+
+
+def cls_dataprep(data, drop_na=False):
+    """Data preparation for classification task.
+
+    This is a default procedure used to preprocess the dataset for
+    classification tasks. The `text` column of the dataset receives the
+    following transformations:
+        Lower case.
+        Numbers changed to `NUM` token.
+        Insert spaces between ponctuatoins.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        dataset with `text` and `target` columns.
+    drop_na : bool, optional
+        remove rows with empty values.
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
+    if drop_na:
+        data.dropna(inplace=True)
+
+    # lower case
+    data.text = data.text.apply(lambda s: s.lower().strip())
+
+    # creates a number token
+    data.text = data.text.apply(lambda s: re.sub(r"\d+", "NUM", s))
+    data.text = data.text.apply(lambda s: re.sub(r"NUM[.,]NUM", "NUM", s))
+
+    # insert spaces between words and ponctuations
+    # exemple: "he is a boy." => "he is a boy ."
+    data.text = data.text.apply(lambda s: re.sub(r"([?.!,¿])", r" \1 ", s))
+    data.text = data.text.apply(lambda s: re.sub(r'[" "]+', " ", s))
+
+    return data
