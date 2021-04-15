@@ -54,4 +54,4 @@ def datasplit(data, train_size, test_size, val_size):
     test = data.loc[test_index]
     val = data.loc[val_index]
 
-    return train, val, test
+    return train, test, val
