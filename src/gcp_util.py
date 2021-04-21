@@ -55,3 +55,21 @@ def get_bucket():
 
     if env == 'COLAB':
         raise NotImplementedError
+
+
+def exists_on_storage(fname):
+    """Verify if the file exists on storage bucket.
+
+    Parameters
+    ----------
+    fname : str
+        file name to search.
+
+    Returns
+    -------
+    stats : boolean
+        True if the file exists. False otherwise.
+    """
+    bucket = get_bucket()
+    stats = storage.Blob(bucket=bucket, name=fname).exists()
+    return stats
