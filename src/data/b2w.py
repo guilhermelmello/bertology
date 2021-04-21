@@ -44,6 +44,26 @@ def download_csv(path, url=CORPUS_CSV, sep=';', encoding='utf-8', **kwargs):
         urllib.request.urlretrieve(url=url, filename=path)
 
 
+def get_dataframe(source=CORPUS_CSV, sep=';', encoding='utf-8', **kwargs):
+    """Reads the corpus from csv source as a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    source : str, optional
+        raw csv path. If not passed will use the oficial corpus source.
+    kwargs :
+        extra arguments passed to `pandas.read_csv`
+
+    Returns
+    -------
+    dataset : pandas.DataFrame
+        B2W corpus
+    """
+    dataset = pd.read_csv(source, sep=sep, encoding=encoding, **kwargs)
+    dataset.columns = [c.lower() for c in dataset.columns]
+    return dataset
+
+
 def get_recommendation_data(path, sep=';', encoding='utf-8', **kwargs):
     """Reads recomendation columns from B2W corpus.
 
