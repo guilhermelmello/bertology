@@ -16,7 +16,7 @@ CORPUS_CSV = 'https://raw.githubusercontent.com/' \
     'b2wdigital/b2w-reviews01/master/B2W-Reviews01.csv'
 
 
-def download_csv(path, url=CORPUS_CSV, **kwargs):
+def download_csv(path, url=CORPUS_CSV, sep=';', encoding='utf-8', **kwargs):
     """Creates a local copy of the csv corpus.
 
 
@@ -38,13 +38,13 @@ def download_csv(path, url=CORPUS_CSV, **kwargs):
     """
     nrows = kwargs.get('nrows', 0)
     if nrows and (nrows > 0):
-        data = pd.read_csv(url, sep=';', encoding='utf-8', **kwargs)
-        data.to_csv(path, sep=';', encoding='utf-8', index=False)
+        data = pd.read_csv(url, sep=sep, encoding=encoding, **kwargs)
+        data.to_csv(path, sep=sep, encoding=encoding, index=False)
     else:
         urllib.request.urlretrieve(url=url, filename=path)
 
 
-def get_recommendation_data(path, **kwargs):
+def get_recommendation_data(path, sep=';', encoding='utf-8', **kwargs):
     """Reads recomendation columns from B2W corpus.
 
     Creates a new dataset from B2W corpus. This new dataset contains
@@ -71,8 +71,17 @@ def get_recommendation_data(path, **kwargs):
                 the product to a friend, and 0 represents that he would not.
                 This column may contain null and other values.
     """
-    usecols = dict(review_text='text', recommend_to_a_friend='target')
-    df = pd.read_csv(path, usecols=usecols, **kwargs)
+    csv_kw = dict(
+        sep=sep,
+        encoding=encoding,
+        **kwargs
+    )
+    usecols = dict(
+        review_text='text',
+        recommend_to_a_friend='target'
+    )
+
+    df = pd.read_csv(path, usecols=usecols, **csv_kw)
     df.columns = [usecols[c] for c in df.columns]
 
     # change target to numeric
@@ -90,7 +99,7 @@ def cls_dataprep(data, drop_na=False):
     following transformations:
         Lower case.
         Numbers changed to `NUM` token.
-        Insert spaces between ponctuatoins.
+        Insert spaces between punctuations.
 
     Parameters
     ----------
@@ -113,7 +122,7 @@ def cls_dataprep(data, drop_na=False):
     data.text = data.text.apply(lambda s: re.sub(r"\d+", "NUM", s))
     data.text = data.text.apply(lambda s: re.sub(r"NUM[.,]NUM", "NUM", s))
 
-    # insert spaces between words and ponctuations
+    # insert spaces between words and punctuations
     # exemple: "he is a boy." => "he is a boy ."
     data.text = data.text.apply(lambda s: re.sub(r"([?.!,¿])", r" \1 ", s))
     data.text = data.text.apply(lambda s: re.sub(r'[" "]+', " ", s))
