@@ -1,6 +1,8 @@
 """Module with general purpose utilities.
 """
+import gcp_util
 import numpy as np
+import tensorflow as tf
 
 
 def datasplit(data, train_size, test_size, val_size):
@@ -55,3 +57,34 @@ def datasplit(data, train_size, test_size, val_size):
     val = data.loc[val_index]
 
     return train, test, val
+
+
+def get_tf_strategy(accelerator='tpu'):
+    """Creates a TensorFlow Strategy for distributed training.
+
+    Creates and configure a strategy for TPU/GPU accelerators. This
+    strategy can be used for TensorFlow model training.
+
+    Parameters
+    ----------
+    accelerator : str, optional
+        accelerator name to use for training.
+        Available options are None, 'tpu' and 'gpu'.
+    """
+    # default strategy
+    strategy = tf.distribute.get_strategy()
+
+    if accelerator == 'tpu':
+        print('Using TPU Strategy')
+        ip = gcp_util.get_tpu_ip()
+        tpu = tf.distribute.cluster_resolver.TPUClusterResolver(ip)
+        tf.config.experimental_connect_to_cluster(tpu)
+        tf.tpu.experimental.initialize_tpu_system(tpu)
+
+        strategy = tf.distribute.TPUStrategy(tpu)
+
+    elif accelerator == 'gpu':
+        raise NotImplementedError
+
+    print("Number of accelerators: ", strategy.num_replicas_in_sync)
+    return strategy

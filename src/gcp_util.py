@@ -73,3 +73,15 @@ def exists_on_storage(fname):
     bucket = get_bucket()
     stats = storage.Blob(bucket=bucket, name=fname).exists()
     return stats
+
+
+def get_tpu_ip():
+    """Return Google Cloud TPU IP.
+
+    Returns
+    -------
+    ip : str
+        TPU IP
+    """
+    ip = os.environ.get('GOOGLE_TPU_IP')
+    return ip
